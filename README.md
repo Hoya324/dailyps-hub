@@ -1,46 +1,117 @@
 # DailyPS Hub
 
-리트코드·프로그래머스의 통과 코드를 `Hoya324/DailyPS`에 저장하는 개인용 Chrome Manifest V3 확장입니다. 기본 설치 대상은 `extension/` 폴더입니다.
+**문제를 풀고 제출하면, 통과한 코드가 내 GitHub에 기록됩니다.**
 
-## 설치
+DailyPS Hub는 LeetCode와 프로그래머스의 정답 제출을 사용자가 지정한 GitHub 저장소에 저장하는 Chrome 확장 프로그램입니다. 각 사용자가 자신의 토큰과 저장소를 연결합니다. 별도 DailyPS 계정이나 운영 서버는 필요하지 않습니다.
 
-[한국어 설치 안내](INSTALL.md)를 따라 `extension/` 폴더를 Chrome에 등록하세요. 기본 풀이 저장소는 `Hoya324/DailyPS`입니다. 이 저장소는 확장 프로그램 소스이며 풀이 저장소와 별개입니다.
+현재 배포 형태는 **압축 해제한 확장 프로그램 직접 설치**입니다. Chrome 웹스토어에는 아직 등록되지 않았습니다. UI와 안내는 한국어로 제공됩니다.
 
-## 구성
-- `extension/lib/capture.js`: 실제 제출 코드 스냅샷과 결과를 연결하는 순수 어댑터
-- `extension/bridge.js`: MAIN world에서 LeetCode fetch/XHR, Programmers ActionCable WebSocket 관찰
-- `extension/relay.js`: 출처 확인·크기/빈도 제한 후 격리 컨텍스트로 전달
-- `extension/lib/core.js`: 목적지·언어·문제 주소 검증, 파일 생성, Git blob 해시
-- `extension/lib/github.js`: 코드+README의 원자적 커밋, 비강제 ref 업데이트, 충돌 재시도
-- `extension/lib/queue.js`, `extension/background.js`: 신뢰 컨텍스트 전용 저장소·대기열·재시도
-- `extension/popup.html`, `extension/options.html`: 한국어 팝업과 연결 설정
+## 주요 기능
 
-토큰과 대기 코드는 Chrome storage.local에 저장합니다. content script 접근을 TRUSTED_CONTEXTS로 제한합니다. 페이지 브리지는 GitHub 토큰을 받지 않습니다. 원격 코드나 외부 UI 라이브러리를 실행하지 않습니다. 문제 페이지 자체가 제공하는 결과를 관찰하는 도구이므로 사이트의 신뢰성과 통신 형식에 의존하며 서버 수준의 채점 증명 도구가 아닙니다.
+- LeetCode·프로그래머스의 전체 통과 제출 자동 저장
+- 제출 시점의 코드와 채점 결과 연결 — 이후 편집한 코드와 혼동하지 않음
+- 코드와 문제 링크·제출 정보를 담은 README를 하나의 커밋으로 저장
+- 사용자별 저장소·브랜치·폴더 설정 및 자동 저장 켜기/끄기
+- 동일 코드 중복 커밋 생략, 변경된 풀이는 Git 이력에 보존
+- 실패 작업의 로컬 대기열·재시도, 최근 저장 결과 확인
 
-## 테스트
-Node.js 22 이상에서 의존성 설치 없이:
+## 빠른 시작
+
+1. GitHub에 풀이용 저장소를 만들고 **Add a README file**을 선택합니다. 공개·비공개 저장소 모두 연결할 수 있습니다.
+2. 이 소스 저장소를 내려받습니다. Chrome의 `chrome://extensions`에서 개발자 모드를 켜고 **압축해제된 확장 프로그램을 로드합니다** → `extension/` 폴더를 선택합니다.
+3. [GitHub Fine-grained token](https://github.com/settings/personal-access-tokens/new)을 만듭니다. 저장할 저장소만 선택하고 **Contents → Read and write**를 허용합니다.
+4. 확장 아이콘 → **설정 / 연결**에서 토큰, 소유자, 저장소, 기존 브랜치, 저장 폴더를 입력하고 **연결 확인하고 저장**을 누릅니다.
+5. 열려 있던 문제 페이지를 새로고침한 뒤 **Submit / 제출 후 채점하기**로 제출합니다. 전체 통과 후 팝업의 **저장 완료** 또는 최근 기록 링크를 확인합니다.
+
+자세한 절차는 [설치 안내](INSTALL.md)를 참고하세요. 토큰 값은 이슈·채팅·소스 코드에 공유하지 마세요.
+
+> 연결 확인은 저장소·브랜치의 읽기 확인입니다. 실제 쓰기 권한이나 조직 정책·브랜치 규칙에 따른 제한은 첫 저장에서 확인될 수 있습니다.
+
+## 저장 예시
+
+저장 폴더의 기본값은 `DailyPS-Hub`이며 변경할 수 있습니다.
+
+```text
+your-repository/
+└── DailyPS-Hub/
+    ├── leetcode/
+    │   └── 1-two-sum/
+    │       ├── Solution.java
+    │       └── README.md
+    └── programmers/
+        └── 150370/
+            ├── Solution.java
+            └── README.md
+```
+
+README에는 문제 제목·링크·언어·제출 식별자·감지 시각이 들어갑니다. 문제 원문은 복제하지 않습니다. 언어에 따라 코드 확장자가 달라집니다. 같은 문제·같은 언어의 새 풀이는 기존 파일을 갱신합니다.
+
+## 지원 범위
+
+| 항목 | 지원 상태 |
+|---|---|
+| LeetCode | leetcode.com 일반 문제의 정답 제출, 기존 및 v2 채점 응답 |
+| 프로그래머스 | 일반 단일 파일 코드 문제의 전체 통과 제출 |
+| 언어 | Java 중심 검증. Python, JavaScript, TypeScript, C/C++, C#, Kotlin, Go, Swift, Ruby, Rust, Scala, SQL 확장자 매핑 제공 |
+| 제외 | Run/예제 실행, 오답, 과거 제출 일괄 수집, LeetCode.cn, 시험·대회 전용 화면, 프로그래머스 빈칸 채우기·다중 파일 |
+
+모든 언어·문제 유형을 실제 사이트에서 검증한 것은 아닙니다. 사이트 통신 방식이 바뀌면 업데이트가 필요할 수 있습니다. LeetCode 공개 문제 번호를 화면에서 얻지 못하면 내부 `question_id`를 사용해 폴더 번호가 다를 수 있습니다. 프로그래머스 제출 식별자는 로컬 생성 값입니다.
+
+## 저장이 안 될 때
+
+| 증상 | 확인 사항 |
+|---|---|
+| 대기열에도 없음 | 자동 저장·사이트 접근 허용 확인, 확장 업데이트 후 문제 페이지 새로고침, 전체 통과한 새 제출인지 확인 |
+| 401 | 토큰 만료 여부 확인 및 교체 |
+| 403 | 토큰의 저장소 선택과 **Contents: Read and write**, 조직 승인, GitHub 요청 제한 확인 |
+| 404 | 소유자·저장소·브랜치 이름, 토큰 접근 대상, README로 저장소 초기화 여부 확인 |
+| 409/422 | 빈 저장소, 동시 변경, 브랜치 보호·저장소 규칙 확인 |
+| 저장 실패 후 대기 | 원인을 해결한 뒤 **다시 저장**. 풀이를 재제출할 필요 없음 |
+| 목적지 변경 후 대기 | 이전 작업은 원래 저장소·브랜치·폴더에 묶임. 원래 설정으로 재시도하거나 필요 없는 작업 제거 |
+
+대기열은 최대 20개·약 4MB, 코드 하나는 최대 200KB입니다. 실패 시 최대 총 5회 시도하며 앞선 실패 작업을 건너뛰지 않습니다. 대기열 비우기는 업로드되지 않은 로컬 코드를 삭제합니다. 자동 저장을 끄면 새 제출과 대기열 처리가 중지되지만 이미 진행 중인 요청은 완료될 수 있습니다.
+
+BaekjoonHub 등 다른 확장과 함께 사용하면 같은 풀이가 두 번 저장될 수 있습니다. 플랫폼별로 자동 저장을 조정하세요.
+
+## 개인정보와 권한
+
+토큰·설정·대기 코드·최근 기록은 현재 Chrome 프로필의 확장 로컬 저장소에 보관됩니다. 토큰은 GitHub API 인증에만 사용하며 문제 페이지에 전달하지 않습니다. 로컬 저장소는 별도 암호화 금고가 아닙니다. 운영자 서버나 분석 서비스로 정보를 보내지 않습니다.
+
+필요한 권한과 삭제 방법은 [개인정보 처리 안내](PRIVACY.md)를 참고하세요. 공개 저장소에 연결하면 업로드한 코드와 기록도 공개됩니다.
+
+## 업데이트
+
+최신 소스로 설치 폴더를 교체하고 `chrome://extensions`에서 확장 **새로고침 ↻**을 누릅니다. 문제 페이지도 새로고침하세요. 같은 설치를 업데이트하면 기존 연결 설정과 대기열을 유지합니다. 삭제 후 재설치하면 확장의 로컬 데이터가 삭제됩니다.
+
+## 개발 및 테스트
+
+Node.js 22 이상에서 단위 테스트를 실행합니다.
 
 ```sh
 npm test
 ```
 
-브라우저 통합 테스트는 Playwright와 Chromium이 필요합니다.
+브라우저 통합 테스트는 Playwright와 Chromium 설치가 필요합니다.
 
 ```sh
-PLAYWRIGHT_MODULE=/absolute/path/to/playwright node tests/browser-smoke.cjs
+npm install --no-save --package-lock=false playwright
+npx playwright install chromium
+node tests/browser-smoke.cjs
 ```
 
-브라우저 테스트는 별도 프로필과 모의 사이트·모의 GitHub API를 사용합니다. 실제 저장소에는 쓰지 않습니다. 테스트 코드는 사용 중인 Chrome 프로필에 연결하지 않습니다.
+별도 프로필에서 모의 사이트·GitHub API를 사용합니다. 신규 사용자 연결, 실제 MV3 로딩, 제출 감지, 새로고침 없는 문제 전환, 원자적 파일 저장 흐름을 검증하며 실제 저장소에는 쓰지 않습니다.
 
-## 알려진 범위
-일반 단일 파일 문제만 지원합니다. 사이트가 내부 프로토콜을 변경하면 어댑터 수정이 필요합니다. 설치 전 제출을 수집하지 않습니다. 빈 저장소는 README로 먼저 초기화하세요. 브랜치 보호·조직 정책에 따라 직접 커밋이 제한될 수 있습니다. 실제 로그인된 계정의 제출 및 실제 저장소 업로드는 사용자가 토큰을 연결한 후 확인해야 합니다.
+| 위치 | 역할 |
+|---|---|
+| `extension/bridge.js`, `lib/capture.js` | 제출 시점 코드와 채점 결과 연결 |
+| `extension/relay.js` | 페이지와 확장 사이 전달 |
+| `extension/background.js`, `lib/queue.js` | 설정·대기열·재시도 |
+| `extension/lib/github.js` | GitHub 커밋과 충돌 처리 |
+| `extension/options.*`, `popup.*` | 연결 설정과 상태 화면 |
+| `tests/` | 단위·브라우저 회귀 테스트 |
 
-프로그래머스 제출 식별자는 로컬 생성 ID입니다. LeetCode는 화면에서 공개 문제 번호를 읽고, 없으면 제출 요청의 question_id를 사용합니다. 이런 경우 폴더 번호가 사이트 공개 번호와 다를 수 있습니다.
+## 버그 제보
 
-## 프로토콜 조사 참고
-- Chrome content scripts: https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts
-- GitHub Git database API: https://docs.github.com/en/rest/git
-- 프로그래머스 공개 문제 페이지와 배포 스크립트 (2026-10-19 확인): https://school.programmers.co.kr/learn/courses/30/lessons/150370
-- 공개 확장 구조 참고: https://github.com/BaekjoonHub/BaekjoonHub
+[Issues](https://github.com/Hoya324/dailyps-hub/issues)에 확장/Chrome 버전, 플랫폼, 문제 링크, 재현 순서, 표시된 오류를 알려주세요. 토큰·쿠키·Authorization 헤더를 포함하지 마세요. 채점 감지 로그는 코드 내용이나 토큰을 출력하지 않지만, 화면을 공유하기 전 개인 정보가 없는지 확인해주세요.
 
-배포 코드와 UI는 이 작업에서 새로 작성했습니다. BaekjoonHub 자체 또는 공식 제휴 제품이 아닙니다.
+DailyPS Hub는 LeetCode, 프로그래머스, GitHub, BaekjoonHub의 공식 제품이나 제휴 서비스가 아닙니다.

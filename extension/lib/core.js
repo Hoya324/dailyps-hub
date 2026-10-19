@@ -1,4 +1,4 @@
-export const DEFAULTS = Object.freeze({owner:'Hoya324',repo:'DailyPS',branch:'main',folder:'DailyPS-Hub',enabled:false});
+export const DEFAULTS = Object.freeze({owner:'',repo:'',branch:'main',folder:'DailyPS-Hub',enabled:false});
 const languages={java:'java',python:'py',python3:'py',javascript:'js',typescript:'ts',cpp:'cpp','c++':'cpp',c:'c',csharp:'cs','c#':'cs',kotlin:'kt',go:'go',golang:'go',swift:'swift',ruby:'rb',rust:'rs',scala:'scala',mysql:'sql',oracle:'sql'};
 export function validateConfig(raw) {
  const c={...DEFAULTS,...raw};

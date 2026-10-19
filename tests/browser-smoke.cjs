@@ -29,9 +29,12 @@ const path=require('path');const assert=require('node:assert/strict');const fs=r
   };
  });
  const options=await context.newPage();await options.goto(`chrome-extension://${id}/options.html`);
+ assert.equal(await options.locator('#owner').inputValue(),'');
+ assert.equal(await options.locator('#repo').inputValue(),'');
+ await options.locator('#owner').fill('example-user');await options.locator('#repo').fill('solutions');
  await options.locator('#token').fill('test-only-token');await options.locator('#save').click();
  await options.waitForFunction(()=>document.querySelector('#status').textContent.includes('連結しました')||document.querySelector('#status').textContent.includes('연결했습니다'));
- assert.equal(await options.locator('#owner').inputValue(),'Hoya324');
+ assert.equal(await options.locator('#owner').inputValue(),'example-user');
  const popup=await context.newPage();await popup.setViewportSize({width:390,height:680});await popup.goto(`chrome-extension://${id}/popup.html`);await popup.waitForFunction(()=>document.querySelector('#enabled').checked);
  await popup.waitForTimeout(250);
  await popup.screenshot({path:path.join(artifacts,'popup.png')});

@@ -3,7 +3,10 @@ async function call(message){const r=await chrome.runtime.sendMessage(message);i
 function error(e){$('status').textContent=e.message;$('status').classList.add('error');}
 async function refresh(){
  const s=await call({type:'state'}),c=s.config;
- $('repo').textContent=`${c.owner}/${c.repo}`;$('repo').href=$('github').href=`https://github.com/${c.owner}/${c.repo}`;
+ const configured=!!(c.owner&&c.repo);
+ $('repo').textContent=configured?`${c.owner}/${c.repo}`:'저장소를 연결하세요';
+ if(configured){$('repo').href=$('github').href=`https://github.com/${c.owner}/${c.repo}`;}else{$('repo').removeAttribute('href');$('github').href='https://github.com/new';}
+ $('github').textContent=configured?'GitHub 열기 ↗':'저장소 만들기 ↗';
  $('branch').textContent=s.connected?`${c.branch} · ${c.folder}`:'아직 연결되지 않았습니다';
  $('enabled').checked=c.enabled;$('enabled').disabled=!s.connected;
  $('toggleHint').textContent=s.connected?(c.enabled?'통과한 제출을 저장합니다':'자동 저장을 일시 중지했습니다'):'설정에서 토큰을 연결하세요';

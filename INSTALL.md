@@ -1,6 +1,6 @@
 # DailyPS Hub 설치 방법
 
-리트코드·프로그래머스의 **통과한 제출 코드**를 `Hoya324/DailyPS`에 저장하는 개인용 크롬 확장입니다. 웹스토어 설치 대신 폴더를 직접 등록합니다.
+리트코드·프로그래머스의 **통과한 제출 코드**를 사용자가 지정한 GitHub 저장소에 저장하는 크롬 확장입니다. 웹스토어 설치 대신 폴더를 직접 등록합니다.
 
 ## 1. 확장 설치
 
@@ -15,12 +15,12 @@
 
 ## 2. GitHub 토큰 만들기
 
-[GitHub 토큰 생성 화면](https://github.com/settings/personal-access-tokens/new)을 엽니다. Hoya324 계정으로 로그인하세요.
+[GitHub 토큰 생성 화면](https://github.com/settings/personal-access-tokens/new)을 엽니다. 저장소에 쓰기 권한이 있는 본인 GitHub 계정으로 로그인하세요.
 
 - Token name: `DailyPS Hub`
 - Expiration: 원하는 만료일 설정. 만료되면 새 토큰으로 교체합니다.
-- Resource owner: `Hoya324`
-- Repository access: **Only select repositories** → **DailyPS** 선택
+- Resource owner: 본인 계정 또는 저장소 소유 조직
+- Repository access: **Only select repositories** → 풀이를 저장할 저장소 선택
 - Repository permissions: **Contents → Read and write**
 - Metadata는 기본 읽기 권한을 유지합니다.
 
@@ -33,8 +33,8 @@ Generate token을 누른 뒤 나온 값을 복사합니다. **토큰은 채팅�
 | 항목 | 값 |
 |---|---|
 | GitHub 토큰 | 방금 만든 토큰 |
-| 소유자 | `Hoya324` |
-| 저장소 | `DailyPS` |
+| 소유자 | 본인 계정 또는 저장소 소유 조직 |
+| 저장소 | 본인의 풀이 저장소 이름 |
 | 브랜치 | `main` — 기존 저장소가 `master`라면 변경 |
 | 저장 폴더 | `DailyPS-Hub` |
 | 연결 후 자동 저장 켜기 | 체크 |
@@ -55,7 +55,7 @@ Generate token을 누른 뒤 나온 값을 복사합니다. **토큰은 채팅�
 저장 구조:
 
 ```text
-Hoya324/DailyPS
+your-account/your-repository
 └── DailyPS-Hub
     ├── leetcode
     │   └── 1-two-sum
@@ -73,7 +73,7 @@ Hoya324/DailyPS
 
 | 상태 | 해결 방법 |
 |---|---|
-| 저장소·브랜치를 찾지 못함 | owner/repo, main/master, 토큰의 DailyPS 접근 권한 확인. 빈 저장소는 README 생성 |
+| 저장소·브랜치를 찾지 못함 | owner/repo, main/master, 토큰의 선택한 저장소 접근 권한 확인. 빈 저장소는 README 생성 |
 | 토큰 만료·401 | 새 토큰 발급 후 설정에서 교체 |
 | 권한·403 | Contents 쓰기 권한, 조직 승인, API 사용 제한 확인 |
 | 충돌·422 | 브랜치 보호 규칙 확인. 직접 커밋 가능한 브랜치 사용 |
@@ -92,7 +92,6 @@ Hoya324/DailyPS
 - Java 우선, Python·JavaScript·TypeScript·C/C++·C#·Kotlin·Go·Swift·Ruby·Rust·Scala·SQL 확장자 매핑 제공. 모든 언어를 실사이트에서 검증한 것은 아닙니다.
 - 프로그래머스 빈칸 채우기, 다중 파일, 시험·대회 전용 화면, LeetCode.cn, 과거 제출 일괄 가져오기는 미지원.
 - BaekjoonHub와 함께 쓰면 프로그래머스 풀이가 양쪽에 저장될 수 있습니다. 한쪽 자동 저장을 끄거나 전용 폴더를 구분해서 사용하세요.
-- 워밍업·본 과정·기출 문제 모두 사이트에서 통과하면 저장됩니다. 노션 체크박스 자동 변경은 포함하지 않습니다.
 
 ## 업데이트
 
@@ -100,7 +99,7 @@ Hoya324/DailyPS
 
 ## 검증 범위
 
-단위 테스트와 별도 Chromium의 모의 사이트/모의 GitHub 통합 테스트로 검증합니다. 실제 로그인된 계정의 제출 및 실제 Hoya324/DailyPS 쓰기는 사용자 토큰 연결 후 첫 통과 제출에서 확인해야 합니다. 사이트 내부 통신이 바뀌면 감지 수정이 필요할 수 있습니다.
+단위 테스트와 별도 Chromium의 모의 사이트/모의 GitHub 통합 테스트로 검증합니다. 실제 로그인된 계정의 제출 및 실제 저장소 쓰기는 사용자 토큰 연결 후 첫 통과 제출에서 확인해야 합니다. 사이트 내부 통신이 바뀌면 감지 수정이 필요할 수 있습니다.
 
 ## 공식 안내
 
