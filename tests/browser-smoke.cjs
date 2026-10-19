@@ -1,13 +1,19 @@
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const path=require('path');const assert=require('node:assert/strict');const fs=require('node:fs');const os=require('node:os');
 (async()=>{
- const extension=path.resolve(__dirname,'../extension');
  const profile=fs.mkdtempSync(path.join(os.tmpdir(),'dailyps-hub-test-'));
+ const extension=path.join(profile,'extension');
+ fs.cpSync(path.resolve(__dirname,'../extension'),extension,{recursive:true});
+ // Expose the real module only in this disposable test copy (workers forbid dynamic import).
+ fs.appendFileSync(path.join(extension,'background.js'),"\nimport {GitHub as TestGitHub} from './lib/github.js';globalThis.TestGitHub=TestGitHub;\n");
  const artifacts=path.resolve(__dirname,'../artifacts');fs.mkdirSync(artifacts,{recursive:true});
  const context=await chromium.launchPersistentContext(profile,{headless:true,channel:'chromium',args:[`--disable-extensions-except=${extension}`,`--load-extension=${extension}`]});
  try{
  let sw=context.serviceWorkers()[0]||await context.waitForEvent('serviceworker');const id=new URL(sw.url()).host;
  const errors=[];context.on('weberror',e=>errors.push(e.error().message));
+ // Exercise the browser's REAL fetch before installing the synthetic GitHub API.
+ const nativeStatus=await sw.evaluate(async()=>{return (await new globalThis.TestGitHub('unused-test-token').request('data:application/json,{}')).status;});
+ assert.equal(nativeStatus,200);
  // Every GitHub API response is local synthetic data. No real repository is touched.
  await sw.evaluate(async()=>{
   await chrome.storage.local.clear();globalThis.apiCalls=[];globalThis.fetch=async(url,options={})=>{

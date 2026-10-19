@@ -8,3 +8,6 @@
 - 팝업 스크린샷을 확인함. 연결 상태는 테스트용 가상 연결이다.
 
 미검증: 실제 로그인 사이트에서 제출, 실제 토큰으로 Hoya324/DailyPS 커밋, Java 이외 각 언어의 실사이트 제출. 첫 실제 통과 제출로 확인할 것.
+
+## 1.0.1 수정
+기본 fetch를 객체 메서드로 호출하면서 발생한 WorkerGlobalScope Illegal invocation 수정. 기본 요청 함수를 전역 fetch 래퍼로 교체. 기본 receiver 단위 테스트와 실제 Service Worker fetch 회귀 검증 추가. 사용자 토큰을 읽지 않고 data URL로 브라우저 동작을 검증함.

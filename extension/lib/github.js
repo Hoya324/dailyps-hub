@@ -2,7 +2,7 @@ import {blobSHA} from './core.js';
 const enc=encodeURIComponent;
 const pathEncode=p=>p.split('/').map(enc).join('/');
 export class GitHub {
- constructor(token,request=fetch){this.token=token;this.request=request;}
+ constructor(token,request=(...args)=>globalThis.fetch(...args)){this.token=token;this.request=request;}
  async api(path,method='GET',body){
   let response;
   try{response=await this.request(`https://api.github.com${path}`,{method,redirect:'error',headers:{Accept:'application/vnd.github+json',Authorization:`Bearer ${this.token}`,'X-GitHub-Api-Version':'2022-11-28',...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(15000)});}catch{throw Error('GitHub 연결에 실패했습니다. 네트워크를 확인하고 재시도하세요.');}

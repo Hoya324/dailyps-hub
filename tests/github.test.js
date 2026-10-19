@@ -7,3 +7,8 @@ test('atomic two-file commit never forces ref',async()=>{const s=server();await 
 test('concurrent update retries from new head',async()=>{const s=server(true);await new GitHub('secret',s.api).commit(cfg,files,'solve');let commits=s.calls.filter(c=>c.path.endsWith('/git/commits')&&c.method==='POST');assert.deepEqual(commits.map(c=>c.body.parents),[['head1'],['head2']]);});
 test('permission failure is actionable without token disclosure',async()=>{let gh=new GitHub('super-secret',async()=>new Response('{}',{status:401}));await assert.rejects(gh.check(cfg),/토큰/);});
 test('dedupe matching solution SHA makes no write',async()=>{const {blobSHA}=await import('../extension/lib/core.js');let sha=await blobSHA(files[0].content),writes=0;let api=async(url,opt={})=>{if(opt.method&&opt.method!=='GET')writes++;let data=url.includes('/contents/')?{sha}:url.includes('/git/ref/')?{object:{sha:'head'}}:{tree:{sha:'tree'}};return new Response(JSON.stringify(data));};let r=await new GitHub('secret',api).commit(cfg,files,'solve');assert.equal(r.skipped,true);assert.equal(writes,0);});
+test('default native fetch keeps the global receiver',async()=>{
+ const original=globalThis.fetch;
+ globalThis.fetch=async function(){assert.equal(this,globalThis,'native fetch requires global receiver');return new Response('{}');};
+ try{await new GitHub('test-only-token').api('/repos/Hoya324/DailyPS');}finally{globalThis.fetch=original;}
+});
