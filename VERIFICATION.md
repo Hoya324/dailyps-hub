@@ -14,3 +14,6 @@
 
 ## 1.0.3 수정
 사용자 Network 로그의 /submissions/detail/2176098802/v2/check/ 경로로 누락 재현 후 v2 및 기존 채점 경로 지원. v2 제출 ID 일치, PENDING, 중복 결과, 오답 회귀 테스트 추가. Chrome 통합 테스트도 v2 경로 사용.
+
+## 1.0.4 수정
+Chrome에서 history.pushState로 두 번째 문제로 이동 후 저장이 누락되는 현상 재현. sender.url의 최초 문서 경로 대신 격리된 relay가 직접 읽은 현재 location.href로 문제 경로 검증. 원본 문서 및 현재 페이지 출처 일치 검증 유지. 새로고침 없는 연속 두 문제 저장을 브라우저 테스트에 추가.

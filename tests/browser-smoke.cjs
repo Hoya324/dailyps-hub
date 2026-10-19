@@ -38,7 +38,7 @@ const path=require('path');const assert=require('node:assert/strict');const fs=r
  // A fresh page with controlled LeetCode request/response fixtures runs real content scripts.
  await context.route('https://leetcode.com/**',route=>{
   const u=new URL(route.request().url());let body='';let type='application/json';
-  if(u.pathname.endsWith('/submit/'))body=JSON.stringify({submission_id:42});
+  if(u.pathname.endsWith('/submit/'))body=JSON.stringify({submission_id:u.pathname.includes('reverse-string')?43:42});
   else if(u.pathname.includes('/check/'))body=JSON.stringify({state:'SUCCESS',status_code:10});
   else{type='text/html';body='<html><head></head><body><h1>1. Two Sum</h1></body></html>';}
   return route.fulfill({status:200,contentType:type,body});
@@ -47,6 +47,15 @@ const path=require('path');const assert=require('node:assert/strict');const fs=r
  await lc.evaluate(async()=>{await fetch('/problems/two-sum/submit/',{method:'POST',body:JSON.stringify({lang:'java',question_id:'1',typed_code:'class Solution { /* snapshot */ }'})});await new Promise(r=>setTimeout(r,100));await fetch('/submissions/detail/42/v2/check/');});
  await popup.waitForFunction(()=>document.querySelector('#status').textContent.includes('저장 완료'));
  let calls=await sw.evaluate(()=>apiCalls);let tree=calls.find(x=>x.path.endsWith('/git/trees'));assert.equal(tree.body.tree[0].content,'class Solution { /* snapshot */ }');assert.equal(tree.body.tree[0].path,'DailyPS-Hub/leetcode/1-two-sum/Solution.java');
+ // A second problem opened by client-side navigation must also be captured.
+ await lc.evaluate(async()=>{
+  history.pushState({},'', '/problems/reverse-string/');
+  document.querySelector('h1').textContent='344. Reverse String';
+  await fetch('/problems/reverse-string/submit/',{method:'POST',body:JSON.stringify({lang:'java',question_id:'344',typed_code:'class Solution { /* second */ }'})});
+  await new Promise(r=>setTimeout(r,100));
+  await fetch('/submissions/detail/43/v2/check/');
+ });
+ await popup.waitForFunction(()=>document.querySelector('#status').textContent.includes('Reverse String'),{},{timeout:5000});
  // Programmers WebSocket fixture uses the real extension bridge and a local routed response.
  await context.route('https://school.programmers.co.kr/**',r=>r.fulfill({status:200,contentType:'text/html; charset=utf-8',body:'<html><body><div class="algorithm-title"><span class="challenge-title">개인정보 수집 유효기간</span></div></body></html>'}));
  await context.routeWebSocket('wss://school.programmers.co.kr/cable',ws=>{ws.onMessage(message=>{let f=JSON.parse(message);if(f.command==='message'){let d=JSON.parse(f.data);ws.send(JSON.stringify({identifier:f.identifier,message:{action:d.action,type:'result_lesson_challenge',passed:true}}));}});});
@@ -54,7 +63,7 @@ const path=require('path');const assert=require('node:assert/strict');const fs=r
  await pg.evaluate(()=>new Promise(resolve=>{const ws=new WebSocket('wss://school.programmers.co.kr/cable');ws.onopen=()=>{ws.send(JSON.stringify({command:'message',identifier:JSON.stringify({channel:'Challenge::AlgorithmChannel',lesson_id:150370,language:'java'}),data:JSON.stringify({action:'submit',codes:{solution:'class Solution { /* 프로그래머스 */ }'}})}));resolve();};}));
  await popup.waitForFunction(()=>document.querySelector('#status').textContent.includes('개인정보'));
  await options.waitForTimeout(300);
- calls=await sw.evaluate(()=>apiCalls);const trees=calls.filter(x=>x.path.endsWith('/git/trees'));assert.equal(trees.length,2);assert.equal(trees[1].body.tree[0].path,'DailyPS-Hub/programmers/150370/Solution.java');
+ calls=await sw.evaluate(()=>apiCalls);const trees=calls.filter(x=>x.path.endsWith('/git/trees'));assert.equal(trees.length,3);assert.equal(trees[1].body.tree[0].path,'DailyPS-Hub/leetcode/344-reverse-string/Solution.java');assert.equal(trees[2].body.tree[0].path,'DailyPS-Hub/programmers/150370/Solution.java');
  // Tokens cannot be read from isolated page contexts through storage APIs.
  const forbidden=await lc.evaluate(()=>typeof chrome?.storage);assert.equal(forbidden,'undefined');
  assert.deepEqual(errors,[]);

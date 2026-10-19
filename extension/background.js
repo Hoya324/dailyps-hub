@@ -20,14 +20,14 @@ async function drain(){
  if(nextJob(state,state.config,Date.now()))void serial(drain);
 }
 const isUI=sender=>sender.id===chrome.runtime.id&&[chrome.runtime.getURL('popup.html'),chrome.runtime.getURL('options.html')].includes(sender.url);
-function validCaptureSender(sender,s){
+function validCaptureSender(sender,s,pageUrl){
  if(sender.id!==chrome.runtime.id||!sender.tab||sender.frameId!==0)return false;
- try{const u=new URL(sender.url);return u.origin===new URL(s.url).origin&& (s.platform==='leetcode'?u.pathname.startsWith(`/problems/${s.slug}/`):u.pathname===`/learn/courses/30/lessons/${s.id}`);}catch{return false;}
+ try{const documentUrl=new URL(sender.url),u=new URL(pageUrl);return documentUrl.origin===u.origin&&u.origin===new URL(s.url).origin&& (s.platform==='leetcode'?u.pathname.startsWith(`/problems/${s.slug}/`):u.pathname===`/learn/courses/30/lessons/${s.id}`);}catch{return false;}
 }
 async function handle(message,sender){
  if(message?.type==='capture'){
   const submission=normalizeSubmission(message.submission);
-  if(!validCaptureSender(sender,submission))throw Error('지원하는 문제 페이지에서만 저장할 수 있습니다.');
+  if(!validCaptureSender(sender,submission,message.pageUrl))throw Error('지원하는 문제 페이지에서만 저장할 수 있습니다.');
   const state=await read();if(!state.config.enabled)return{ok:true,ignored:true};
   if(!state.token)throw Error('GitHub 연결이 필요합니다.');
   const added=enqueue(state,submission,state.config);
