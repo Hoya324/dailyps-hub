@@ -11,3 +11,6 @@
 
 ## 1.0.1 수정
 기본 fetch를 객체 메서드로 호출하면서 발생한 WorkerGlobalScope Illegal invocation 수정. 기본 요청 함수를 전역 fetch 래퍼로 교체. 기본 receiver 단위 테스트와 실제 Service Worker fetch 회귀 검증 추가. 사용자 토큰을 읽지 않고 data URL로 브라우저 동작을 검증함.
+
+## 1.0.3 수정
+사용자 Network 로그의 /submissions/detail/2176098802/v2/check/ 경로로 누락 재현 후 v2 및 기존 채점 경로 지원. v2 제출 ID 일치, PENDING, 중복 결과, 오답 회귀 테스트 추가. Chrome 통합 테스트도 v2 경로 사용.

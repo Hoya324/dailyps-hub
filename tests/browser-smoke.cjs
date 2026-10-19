@@ -44,7 +44,7 @@ const path=require('path');const assert=require('node:assert/strict');const fs=r
   return route.fulfill({status:200,contentType:type,body});
  });
  const lc=await context.newPage();await lc.goto('https://leetcode.com/problems/two-sum/');
- await lc.evaluate(async()=>{await fetch('/problems/two-sum/submit/',{method:'POST',body:JSON.stringify({lang:'java',question_id:'1',typed_code:'class Solution { /* snapshot */ }'})});await new Promise(r=>setTimeout(r,100));await fetch('/submissions/detail/42/check/');});
+ await lc.evaluate(async()=>{await fetch('/problems/two-sum/submit/',{method:'POST',body:JSON.stringify({lang:'java',question_id:'1',typed_code:'class Solution { /* snapshot */ }'})});await new Promise(r=>setTimeout(r,100));await fetch('/submissions/detail/42/v2/check/');});
  await popup.waitForFunction(()=>document.querySelector('#status').textContent.includes('저장 완료'));
  let calls=await sw.evaluate(()=>apiCalls);let tree=calls.find(x=>x.path.endsWith('/git/trees'));assert.equal(tree.body.tree[0].content,'class Solution { /* snapshot */ }');assert.equal(tree.body.tree[0].path,'DailyPS-Hub/leetcode/1-two-sum/Solution.java');
  // Programmers WebSocket fixture uses the real extension bridge and a local routed response.

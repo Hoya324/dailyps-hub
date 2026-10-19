@@ -10,7 +10,7 @@
     if(this.lc.size>30)this.lc.delete(this.lc.keys().next().value);
     const slug=submit[1];this.lc.set(String(response.submission_id),{platform:'leetcode',id:String(meta.id||body.question_id),slug,title:meta.title||slug,language:body.lang,code:body.typed_code,submissionId:String(response.submission_id),url:`https://leetcode.com/problems/${slug}/`,at:Date.now()});return;
    }
-   const check=path.match(/^\/submissions\/detail\/(\d+)\/check\/$/);
+   const check=path.match(/^\/submissions\/detail\/(\d+)\/(?:v2\/)?check\/$/);
    if(!check)return;
    const s=this.lc.get(check[1]);if(!s||response?.state!=='SUCCESS')return;
    this.lc.delete(check[1]);
