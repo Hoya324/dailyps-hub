@@ -1,5 +1,5 @@
 {
- "manifest_version":3,"name":"DailyPS Hub","version":"1.0.1","minimum_chrome_version":"111",
+ "manifest_version":3,"name":"DailyPS Hub","version":"1.0.2","minimum_chrome_version":"111",
  "description":"리트코드·프로그래머스에서 통과한 코드를 Hoya324/DailyPS 등 지정한 GitHub 저장소에 저장합니다.",
  "permissions":["storage","alarms"],
  "host_permissions":["https://api.github.com/*"],

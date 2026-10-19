@@ -1,1 +1,1 @@
-{"name":"dailyps-hub","version":"1.0.1","private":true,"type":"module","scripts":{"test":"node --test tests/*.test.js"}}
+{"name":"dailyps-hub","version":"1.0.2","private":true,"type":"module","scripts":{"test":"node --test tests/*.test.js"}}
