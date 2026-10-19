@@ -38,6 +38,20 @@ const path=require('path');const assert=require('node:assert/strict');const fs=r
  const popup=await context.newPage();await popup.setViewportSize({width:390,height:680});await popup.goto(`chrome-extension://${id}/popup.html`);await popup.waitForFunction(()=>document.querySelector('#enabled').checked);
  await popup.waitForTimeout(250);
  await popup.screenshot({path:path.join(artifacts,'popup.png')});
+ if(process.env.STORE_ASSETS){
+  const dest=path.resolve(process.env.STORE_ASSETS);fs.mkdirSync(dest,{recursive:true});
+  await options.setViewportSize({width:1280,height:800});
+  await options.screenshot({path:path.join(dest,'settings-1280x800.png')});
+  const png=fs.readFileSync(path.join(artifacts,'popup.png')).toString('base64');
+  const artwork=await context.newPage();await artwork.setViewportSize({width:1280,height:800});
+  await artwork.setContent(`<html lang="ko"><meta charset="utf-8"><style>body{margin:0;background:#eef4fa;font-family:Arial,'Apple SD Gothic Neo',sans-serif;color:#182b3d}.wrap{height:800px;display:flex;align-items:center;justify-content:center;gap:90px}h1{font-size:56px;letter-spacing:-2px}h1 span{color:#1976cf}h2{font-size:30px;line-height:1.6}p{font-size:19px;line-height:1.7;color:#557087}img{width:390px;box-shadow:0 20px 60px #18385525;border-radius:16px}.label{font-size:14px}</style><div class="wrap"><div><h1>DailyPS<span>Hub</span></h1><h2>오늘 푼 코드,<br>내 GitHub에 차곡차곡</h2><p>LeetCode · 프로그래머스<br>통과한 제출 자동 저장<br>저장소·브랜치·폴더 직접 설정</p><p class="label">실제 확장 화면 · 연결 정보는 예시입니다</p></div><img src="data:image/png;base64,${png}"></div></html>`);
+  await artwork.screenshot({path:path.join(dest,'popup-1280x800.png')});
+  await artwork.setViewportSize({width:440,height:280});
+  await artwork.setContent(`<html><meta charset="utf-8"><style>body{margin:0;background:#eef4fa;color:#182b3d;font-family:Arial,sans-serif;display:flex;align-items:center;justify-content:center;height:280px}h1{font-size:44px;letter-spacing:-2px;margin:0 0 22px}span{color:#1976cf}p{font-size:19px;line-height:1.6;margin:0;color:#466681}</style><div><h1>DailyPS<span>Hub</span></h1><p>Accepted code → GitHub<br>LeetCode · Programmers</p></div></html>`);
+  await artwork.screenshot({path:path.join(dest,'promo-440x280.png')});await artwork.close();
+  fs.copyFileSync(path.join(extension,'icons/icon128.png'),path.join(dest,'icon128.png'));
+ }
+
  // A fresh page with controlled LeetCode request/response fixtures runs real content scripts.
  await context.route('https://leetcode.com/**',route=>{
   const u=new URL(route.request().url());let body='';let type='application/json';

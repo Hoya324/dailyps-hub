@@ -115,3 +115,7 @@ node tests/browser-smoke.cjs
 [Issues](https://github.com/Hoya324/dailyps-hub/issues)에 확장/Chrome 버전, 플랫폼, 문제 링크, 재현 순서, 표시된 오류를 알려주세요. 토큰·쿠키·Authorization 헤더를 포함하지 마세요. 채점 감지 로그는 코드 내용이나 토큰을 출력하지 않지만, 화면을 공유하기 전 개인 정보가 없는지 확인해주세요.
 
 DailyPS Hub는 LeetCode, 프로그래머스, GitHub, BaekjoonHub의 공식 제품이나 제휴 서비스가 아닙니다.
+
+## Chrome 웹스토어 배포 준비
+
+스토어 등록 문구, 권한 사유 및 심사자 안내는 [제출 가이드](store/SUBMISSION.md)에 있습니다. 아직 웹스토어에 게시되지 않았습니다.

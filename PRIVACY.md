@@ -37,3 +37,7 @@ GitHub API에는 인증 토큰과 사용자가 연결한 저장소에 저장할 
 ## 문의
 
 프로젝트의 [Issues](https://github.com/Hoya324/dailyps-hub/issues)를 이용하세요. 토큰이나 쿠키를 게시하지 마세요.
+
+## 이용 제한
+
+DailyPS Hub의 사용자 데이터 사용은 Chrome Web Store User Data Policy의 Limited Use 요구사항을 준수합니다. 데이터는 사용자가 요청한 풀이 저장 기능 제공에만 사용하며 판매·광고·신용도 평가에 사용하지 않습니다.
